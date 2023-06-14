@@ -1,0 +1,10 @@
+pipline{
+    agent any
+    states {
+        stage('Clone'){
+            steps {
+                git 'https://github.com/letrungthanh101/Demo-Jenkins'
+            }
+        }
+    }
+}
