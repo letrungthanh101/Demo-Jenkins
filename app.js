@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 app.get('/', function (req, res) {
-  res.send('Hello các phen!');
+  res.send('Hello mai phen!');
 });
 app.listen(3000, function () {
   console.log('Example app listening on port!');
