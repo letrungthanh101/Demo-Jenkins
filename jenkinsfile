@@ -1,10 +1,11 @@
-pipline{
-    agent any
-    states {
-        stage('Clone'){
-            steps {
-                git 'https://github.com/letrungthanh101/Demo-Jenkins'
-            }
+node{
+    stage('Checkout code'){
+            // tạo credentialsID cho github
+            //ex
+          git branch: 'main', credentialsId: 'b57e2f49-0d91-4bf9-9fa4-f46eece62e3c', url: 'https://github.com/letrungthanh101/Demo-Jenkins'
         }
-    }
-}
+        stage('Build') {
+            sh "npm install"
+        }
+} 
+   
