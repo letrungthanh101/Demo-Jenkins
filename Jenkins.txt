@@ -1,0 +1,46 @@
+Run jenskin
+
+docker run -p 8080:8080 jenkins/jenkins
+
+docker run -p  9000:9000 sonarqube
+
+add sonar extendsion
+
+docker run --name sonarqube101 -h sonarqube101 -p 8094:9000 -d sonarqube
+
+
+chạy trên windown
+docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube
+
+
+
+Nodejs_Demo
+sonarKey nodejs: sqa_adca31d3fa1971af6b1ee8f4e4b72adb885b942f --> bỏ vào trong serect text
+
+
+sonar.projectKey=NodejsDemo
+
+Jenkins key : 9f88c55305f74ac0b29ffc8e1c2bd121
+
+
+
+node {
+  stage('SCM') {
+    checkout scm
+  }
+  stage('SonarQube Analysis') {
+    def scannerHome = tool 'SonarScanner';
+    withSonarQubeEnv() {
+      sh "${scannerHome}/bin/sonar-scanner"
+    }
+  }
+}
+
+
+
+
+plugin cần : nodejs , sonar scanner, ansible
+
+docker logs -f sonarqube101
+
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 049b67861ef1
