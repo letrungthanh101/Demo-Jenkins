@@ -1,11 +1,80 @@
 node{
+
+    agent {
+
+        docker {
+            image 'node:latest'
+            args '-v $HOME/.npm:root/.npm'
+        }
+    }
+
     stage('Checkout code'){
             // tạo credentialsID cho github
             //ex
-          git branch: 'main', credentialsId: 'b57e2f49-0d91-4bf9-9fa4-f46eece62e3c', url: 'https://github.com/letrungthanh101/Demo-Jenkins'
+          git branch: 'main', credentialsId: '237f1961-8642-442c-b962-de9b8a21ed47', url: 'https://github.com/letrungthanh101/Demo-Jenkins.git'
+        }
+   stage('SonarQube Scan') {
+            steps {
+                // Sử dụng SonarScanner để quét mã nguồn
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+                timeout(time:1,unit: 'HOURS') {
+                    def qg = waitForQualityGate()
+                        if(qg.status != 'OK'){
+                            error "Pipline aborted due to quality gate failure: ${qg.status}"
+                        }
+                        //sh "mvn clean install"
+                        sh "npm install"
+                        sh "npm run build"
+                }
+            }
+        }
+
+    stage('Build') {
+            steps {
+                // Xây dựng chương trình Node.js bằng NPM
+                sh 'npm install'
+            }
+        }
+}
+
+
+
+
+
+
+
+pipeline {
+    agent {
+        docker {
+            image 'node:latest'
+            args '-v $HOME/.npm:/root/.npm'
+        }
+    }
+    stages {
+        stage('Checkout code') {
+            steps {
+                git branch: 'main', credentialsId: '237f1961-8642-442c-b962-de9b8a21ed47', url: 'https://github.com/letrungthanh101/Demo-Jenkins.git'
+            }
+        }
+        stage('SonarQube Scan') {
+            steps {
+             
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+               
+                
+            }
         }
         stage('Build') {
-            sh "npm install"
+           
+                    sh "npm run build"
         }
-} 
-   
+    }
+}
+
+
+
+
