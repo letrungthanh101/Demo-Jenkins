@@ -1,80 +1,45 @@
-node{
-
-    agent {
-
-        docker {
-            image 'node:latest'
-            args '-v $HOME/.npm:root/.npm'
-        }
-    }
-
-    stage('Checkout code'){
-            // tạo credentialsID cho github
-            //ex
-          git branch: 'main', credentialsId: '237f1961-8642-442c-b962-de9b8a21ed47', url: 'https://github.com/letrungthanh101/Demo-Jenkins.git'
-        }
-   stage('SonarQube Scan') {
-            steps {
-                // Sử dụng SonarScanner để quét mã nguồn
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
-                }
-                timeout(time:1,unit: 'HOURS') {
-                    def qg = waitForQualityGate()
-                        if(qg.status != 'OK'){
-                            error "Pipline aborted due to quality gate failure: ${qg.status}"
-                        }
-                        //sh "mvn clean install"
-                        sh "npm install"
-                        sh "npm run build"
-                }
-            }
-        }
-
-    stage('Build') {
-            steps {
-                // Xây dựng chương trình Node.js bằng NPM
-                sh 'npm install'
-            }
-        }
-}
-
-
-
-
-
-
-
 pipeline {
-    agent {
-        docker {
-            image 'node:latest'
-            args '-v $HOME/.npm:/root/.npm'
-        }
+    agent any
+    tools {
+        nodejs "NodeJS"
+        maven "Maven"
+        
     }
     stages {
         stage('Checkout code') {
             steps {
-                git branch: 'main', credentialsId: '237f1961-8642-442c-b962-de9b8a21ed47', url: 'https://github.com/letrungthanh101/Demo-Jenkins.git'
+               git branch: 'main', credentialsId: 'e10b9139-dc6a-4dfa-a022-39b58cc23070', url: 'https://github.com/letrungthanh101/Demo-Jenkins.git'
             }
         }
-        stage('SonarQube Scan') {
+        stage('Install Dependencies'){
             steps {
-             
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner'
-                }
-               
-                
+                sh 'npm install'
             }
         }
-        stage('Build') {
+        stage('SonarQube Analysis'){
            
-                    sh "npm run build"
+            steps {
+                // withSonarQubeEnv('SonarQube Server') {
+                //     // sh "mvn sonar:sonar"
+                //     sh "mvn package sonar:sonar sonar.projectKey=NodejsDemo"
+                    
+                // }
+                withSonarQubeEnv('SonarQube Server') {
+                    sh "npm install sonar-scanner"
+                    // sh "npm rụn test"
+                    // sh "npm rụn coverage-lcov"
+                    // sh "npm run sonar"
+                    
+                }
+            }
+            
         }
+         stage("Quality Gate") {
+            steps {
+              timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+         }
     }
 }
-
-
-
-
