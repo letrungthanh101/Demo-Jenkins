@@ -44,3 +44,7 @@ plugin cần : nodejs , sonar scanner, ansible
 docker logs -f sonarqube101
 
 docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 049b67861ef1
+
+
+def scannerHome = tool 'sonarqube'
+sh "${scannerHome}
